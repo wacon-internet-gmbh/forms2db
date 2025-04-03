@@ -1,0 +1,44 @@
+{
+  "name": "wacon/forms2db",
+  "description": "Forms finisher, to save in database.",
+  "version": "1.0.0",
+  "type": "typo3-cms-extension",
+  "homepage": "",
+  "authors": [
+    {
+      "name": "Kerstin Schmitt",
+      "email": "info@wacon.de",
+      "homepage": "https://www.wacon.de"
+    }
+  ],
+  "license": "GPL-3.0-or-later",
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://composer.typo3.org/"
+    }
+  ],
+  "config": {
+    "vendor-dir": ".Build/vendor",
+    "bin-dir": ".Build/bin"
+  },
+  "require": {
+    "php": ">=8.1.0",
+    "typo3/cms-core": "^12.4 || ^13.4",
+    "typo3/cms-form": "^12.4 || ^13.4",
+    "ext-json": "*",
+    "ext-pdo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "WACON\\Forms2db\\": "Classes"
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "forms2db",
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/Web"
+    }
+  }
+}

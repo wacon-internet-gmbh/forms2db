@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="EXT:forms2db/Resources/Private/Language/locallang_db.xlf" date="2024-01-24T08:58:44Z" product-name="forms2db">
+		<header/>
+		<body>
+			<trans-unit id="tx_forms2db_domain_model_mail" resname="tx_forms2db_domain_model_mail">
+				<source>Mail</source>
+			</trans-unit>
+			<trans-unit id="tx_forms2db_domain_model_mail.persistence_id" resname="tx_forms2db_domain_model_mail.persistence_id">
+				<source>Formular Definition</source>
+			</trans-unit>
+			<trans-unit id="tx_forms2db_domain_model_mail.form_id" resname="tx_forms2db_domain_model_mail.form_id">
+				<source>Formular ID</source>
+			</trans-unit>
+
+			<trans-unit id="tx_forms2db_domain_model_mail.plugin_id" resname="tx_forms2db_domain_model_mail.plugin_id">
+				<source>Plugin ID</source>
+			</trans-unit>
+			<trans-unit id="tx_forms2db_domain_model_mail.result" resname="tx_forms2db_domain_model_mail.result">
+				<source>Daten</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

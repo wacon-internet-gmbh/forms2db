@@ -1,0 +1,8 @@
+TYPO3:
+  CMS:
+    Form:
+      prototypes:
+        standard:
+          finishersDefinition:
+            Formstodb:
+              implementationClassName: 'WACON\Forms2db\Domain\Finishers\Forms2dbFinisher'
