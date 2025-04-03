@@ -1,0 +1,38 @@
+<html
+   xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+   xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+   xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+   data-namespace-typo3-fluid="true">
+
+   <f:layout name="Module" />
+
+   <f:section name="Content">
+    <table class="table">
+        <tr>
+            <th>
+                Seite
+            </th>
+            <th>
+                Plugin ID
+            </th>
+            <th>
+                Form ID
+            </th>
+            <th>
+
+            </th>
+        </tr>
+  
+       <f:for each="{plugins}" as="plugin">
+            <tr>
+                <td>{plugin.page_title} ({plugin.page_id})</td>
+                <td>{plugin.plugin_id}</td>
+                <td>{plugin.form_id}</td>
+                <td><f:link.action class="btn btn-primary" action="show" arguments="{plugin:plugin}">Download</f:link.action></td>
+            </tr>
+                
+        </f:for>
+    </table>
+   </f:section>
+
+</html>

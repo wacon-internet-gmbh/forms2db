@@ -14,7 +14,9 @@ return [
         'searchFields' => [
             'ignorePageTypeRestriction' => true
         ],
-        'security' => 'secret',
+        'security' => [
+            'ignorePageTypeRestriction' => true,
+        ],
         'iconfile' => 'EXT:forms2db/Resources/Public/Icons/Extension.png'
     ],
     'types' => [

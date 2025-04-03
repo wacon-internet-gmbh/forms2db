@@ -6,4 +6,7 @@ services:
 
   WACON\Forms2db\:
     resource: '../Classes/*'
+  
+  WACON\Forms2db\Controller\FormsdbModuleController:
+    tags: ['backend.controller']
 

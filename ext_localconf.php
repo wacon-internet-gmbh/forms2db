@@ -7,5 +7,13 @@
  */
 
 defined('TYPO3') or die();
+call_user_func(function (): void {
+    $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
+    $iconRegistry->registerIcon(
+        'actions-print',
+        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+        ['source' => 'EXT:forms2db/Resources/Public/Icons/Extension.svg']
+    );
 
+});
 

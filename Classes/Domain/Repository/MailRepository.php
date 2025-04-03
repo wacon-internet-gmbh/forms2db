@@ -47,6 +47,17 @@ class MailRepository extends Repository
         $defaultQuerySettings->setRespectStoragePage(false);
         $this->setDefaultQuerySettings($defaultQuerySettings);
     }
-
+    public function findByPlugin(array $plugin): QueryResultInterface {
+        $query = $this->createQuery();
+        return $query
+        ->matching(
+            $query->logicalAnd(
+                $query->equals('pid', $plugin['page_id']),
+                $query->equals('plugin_id', $plugin['plugin_id']),
+                $query->equals('form_id', $plugin['form_id']),
+            ),
+        )
+            ->execute();
+    }
 
 }
