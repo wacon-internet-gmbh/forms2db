@@ -10,7 +10,7 @@
 /** @noinspection PhpUndefinedVariableInspection */
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Forms finisher: save to database',
-    'description' => 'Forms finisher, to save in database.',
+    'description' => 'With forms2db, form data from the Forms extension is stored in the database. Additionally, the data can be exported in CSV format using a dedicated module.',
     'category' => 'frontend',
     'constraints' => [
         'depends' => [
@@ -29,5 +29,5 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Kerstin Schmitt',
     'author_email' => 'info@wacon.de',
     'author_company' => 'WACON Internet GmbH',
-    'version' => '1.0.0'
+    'version' => '1.0.1'
 ];
