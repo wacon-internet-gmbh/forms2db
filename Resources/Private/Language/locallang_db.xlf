@@ -17,7 +17,7 @@
 				<source>Plugin ID</source>
 			</trans-unit>
 			<trans-unit id="tx_forms2db_domain_model_mail.result" resname="tx_forms2db_domain_model_mail.result">
-				<source>Daten</source>
+				<source>Data</source>
 			</trans-unit>
 		</body>
 	</file>

@@ -14,7 +14,7 @@
  */
 
 
-use WACON\Forms2db\Controller\FormsdbModuleController;
+use WACON\Forms2db\Controller\Backend\FormsdbModuleController;
 
 /**
  * Definitions for modules provided by EXT:examples
@@ -27,11 +27,11 @@ return [
         'workspaces' => 'live',
         'path' => '/module/page/form2db',
         'labels' => 'LLL:EXT:forms2db/Resources/Private/Language/Module/locallang_mod.xlf',
-        'extensionName' => 'Forms2db',
+        'extensionName' => 'forms2db',
         'iconIdentifier' => 'actions-print',
         'controllerActions' => [
             FormsdbModuleController::class => [
-                'list','show'
+                'list','show','excel',
             ],
         ],
     ],

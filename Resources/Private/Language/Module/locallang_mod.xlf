@@ -10,7 +10,7 @@
 				<source>This module shows all results of frontend forms were saved to the database.</source>
 			</trans-unit>
 			<trans-unit id="mlang_tabs_tab">
-				<source>Form results</source>
+				<source>Forms results</source>
 			</trans-unit>
 		</body>
 	</file>

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of the "forms2db" Extension for TYPO3 CMS.
  *
@@ -6,7 +7,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace WACON\Forms2db\Controller;
+namespace WACON\Forms2db\Controller\Backend;
 use TYPO3\CMS\Backend\Attribute\AsController;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Template\Components\ButtonBar;
@@ -19,6 +20,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use WACON\Forms2db\Domain\Repository\MailRepository;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 
+#[AsController]
 final class FormsdbModuleController extends ActionController
 {
    
@@ -31,12 +33,10 @@ final class FormsdbModuleController extends ActionController
     }
     /**
      * Form Overview
+     *   * @return ResponseInterface
      *
-     * @throws InvalidQueryException|DBALException
-     * @internal
-     * @noinspection PhpUndefinedMethodInspection
      */
-    public function listAction(int $page = 1): ResponseInterface
+    public function listAction(): ResponseInterface
     {
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_forms2db_domain_model_mail');
@@ -68,18 +68,13 @@ final class FormsdbModuleController extends ActionController
      * @throws Exception
      * @todo Add more charsets?
      */
-    public function showAction(): ResponseInterface
+    public function excelAction(): ResponseInterface
     {
-        $charset = 'UTF-8';
-        //\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($this->request->getArguments());
+        $charset = 'Windows-1252';
         if(array_key_exists('plugin', $this->request->getArguments())){
         $plugin = $this->request->getArgument('plugin');
         $mails = $this->mailRepository->findByPlugin($this->request->getArgument('plugin'));
         $formIdentifier = 'page-'.$plugin['page_id'].'_plugin-'.$plugin['plugin_id'].'_form-'.$plugin['form_id'].'_'.date("Y-m-d");
-        
-        //$formPersistenceIdentifier = $this->request->getArgument('formPersistenceIdentifier');
-        //$filtered = $this->request->hasArgument('filtered') === true && $this->request->getArgument('filtered') === '1';
-       
         $csvContent = '';
         $i=0;
         foreach ($mails as $result) {
@@ -93,19 +88,73 @@ final class FormsdbModuleController extends ActionController
                     $i++;
                     foreach ($jsonDecoded as $key => $value)
                     {
-                        $csvContent.= $key.';';
+                        $csvContent.= '"'.$key.'";';
                     }
                     $csvContent .= '
 ';
                     
                 }
-                $csvContent .=  implode(';', $jsonDecoded).'
+                $csvContent .=  '"'.implode('";"', $jsonDecoded).'"
 ';
               }
         }
     }
-        //$csvContent = "\xEF\xBB\xBF" . $this->getCsvContent($formPersistenceIdentifier, $filtered);
-       // \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($csvContent);
+    $this->convertToWindowsCharset($csvContent);
+        return $this->responseFactory
+            ->createResponse()
+            ->withHeader(
+                'Content-Type',
+                sprintf('application/json; charset=%s', $charset ?? 'windows-1252')
+            )
+            ->withHeader(
+                'Content-Disposition',
+                sprintf('attachment; filename="%s";', $formIdentifier.'.csv')
+            )
+            ->withHeader(
+                'Content-Length',
+                (string)strlen($csvContent)
+            )
+            ->withBody($this->streamFactory->createStream((string)($csvContent)));
+
+    }
+    /**
+     * Downloads the current results list as CSV
+     *
+     * @throws NoSuchArgumentException
+     * @throws Exception
+     * @todo Add more charsets?
+     */
+    public function showAction(): ResponseInterface
+    {
+        $charset = 'UTF-8';
+        if(array_key_exists('plugin', $this->request->getArguments())){
+        $plugin = $this->request->getArgument('plugin');
+        $mails = $this->mailRepository->findByPlugin($this->request->getArgument('plugin'));
+        $formIdentifier = 'page-'.$plugin['page_id'].'_plugin-'.$plugin['plugin_id'].'_form-'.$plugin['form_id'].'_'.date("Y-m-d");
+        $csvContent = '';
+        $i=0;
+        foreach ($mails as $result) {
+            $jsonDecoded = json_decode($result->getMail(), true);
+           
+            
+            
+            if (is_array($jsonDecoded)) {
+                if($i==0){
+                    
+                    $i++;
+                    foreach ($jsonDecoded as $key => $value)
+                    {
+                        $csvContent.= '"'.$key.'";';
+                    }
+                    $csvContent .= '
+';
+                    
+                }
+                $csvContent .=  '"'.implode('";"', $jsonDecoded).'"
+';
+              }
+        }
+    }
         return $this->responseFactory
             ->createResponse()
             ->withHeader(
@@ -123,7 +172,16 @@ final class FormsdbModuleController extends ActionController
             ->withBody($this->streamFactory->createStream((string)($csvContent)));
 
     }
-   
+    protected function convertToWindowsCharset($string) {
+        $charset =  mb_detect_encoding(
+          $string,
+          "UTF-8, utf-8, ISO-8859-1, ISO-8859-15",
+          true
+        );
+      
+        $string =  mb_convert_encoding($string, "Windows-1252", $charset);
+        return $string;
+      }
 
     /**
      * Register document header buttons
