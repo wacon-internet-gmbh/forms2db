@@ -17,3 +17,7 @@ call_user_func(function (): void {
 
 });
 
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\TYPO3\CMS\Scheduler\Task\TableGarbageCollectionTask::class]['options']['tables']['tx_forms2db_domain_model_mail'] = [
+    'dateField' => 'tstamp',
+    'expirePeriod' => '180',
+ ];
