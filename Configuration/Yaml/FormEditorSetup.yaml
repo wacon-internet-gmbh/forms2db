@@ -26,6 +26,7 @@ TYPO3:
                           templateName: Inspector-RemoveElementEditor
           finishersDefinition:
             Formstodb:
+              implementationClassName: 'WACON\Forms2db\Domain\Finishers\Forms2dbFinisher'
               formEditor:
                 iconIdentifier: form-finisher
                 label: formEditor.elements.Form.finisher.SaveToDatabase.editor.header.label
