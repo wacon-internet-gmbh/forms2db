@@ -1,7 +1,6 @@
 {
   "name": "wacon/forms2db",
   "description": "Forms finisher, to save in database.",
-  "version": "1.1.0",
   "type": "typo3-cms-extension",
   "homepage": "",
   "authors": [
