@@ -2,7 +2,7 @@
   "name": "wacon/forms2db",
   "description": "Forms finisher, to save in database.",
   "type": "typo3-cms-extension",
-  "homepage": "",
+  "homepage": "https://www.wacon.de/typo3-service/forms2db.html",
   "authors": [
     {
       "name": "Kerstin Schmitt",

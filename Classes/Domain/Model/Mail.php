@@ -53,10 +53,9 @@ class Mail extends AbstractEntity
      */
     protected string $mail = '';
 
-    /**
-     * Create date
-     */
-    protected \DateTime $crdate;
+ 
+ /** @var int */
+protected $crdate;
 
     /**
      * Timestamp
@@ -179,22 +178,21 @@ class Mail extends AbstractEntity
         $this->setMail(!empty($mailArray) ? json_encode($mailArray, JSON_THROW_ON_ERROR) : '');
     }
 
-    /**
-     * Gets the crdate
-     *
-     * @return DateTime
-     */
-    public function getCrdate(): DateTime
-    {
-        return $this->crdate;
+   /**
+    * Returns the crdate
+    *
+    * @return int
+    */
+    public function getCrdate() {
+        return $this->crdate;   
     }
 
     /**
      * Sets the crdate
      *
-     * @param DateTime $crdate
+     * @param int $crdate
      */
-    public function setCrdate(DateTime $crdate): void
+    public function setCrdate(int $crdate): void
     {
         $this->crdate = $crdate;
     }

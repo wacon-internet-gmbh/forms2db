@@ -49,6 +49,17 @@ final class FormsdbModuleController extends ActionController
                 // Do something with that single row
                 $myrow = array();
                 $page = $this->pageRepository->getPage($row['pid']);
+                $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_forms2db_domain_model_mail');
+                $myrow['count'] = $queryBuilder
+                ->count('uid')
+                ->from('tx_forms2db_domain_model_mail')
+                ->where(
+                    $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter($row['pid'], Connection::PARAM_STR)),
+                    $queryBuilder->expr()->eq('plugin_id', $queryBuilder->createNamedParameter($row['plugin_id'], Connection::PARAM_STR)),
+                    $queryBuilder->expr()->eq('form_id', $queryBuilder->createNamedParameter($row['form_id'], Connection::PARAM_STR))
+                )
+                ->executeQuery()
+                ->fetchOne();
                 $myrow['page_id']= $row['pid'];
                 $myrow['page_title']= $page['title'];
                 $myrow['plugin_id']= $row['plugin_id'];
@@ -61,68 +72,12 @@ final class FormsdbModuleController extends ActionController
     }
 
 
+    
     /**
      * Downloads the current results list as CSV
      *
      * @throws NoSuchArgumentException
      * @throws Exception
-     * @todo Add more charsets?
-     */
-    public function excelAction(): ResponseInterface
-    {
-        $charset = 'Windows-1252';
-        if(array_key_exists('plugin', $this->request->getArguments())){
-        $plugin = $this->request->getArgument('plugin');
-        $mails = $this->mailRepository->findByPlugin($this->request->getArgument('plugin'));
-        $formIdentifier = 'page-'.$plugin['page_id'].'_plugin-'.$plugin['plugin_id'].'_form-'.$plugin['form_id'].'_'.date("Y-m-d");
-        $csvContent = '';
-        $i=0;
-        foreach ($mails as $result) {
-            $jsonDecoded = json_decode($result->getMail(), true);
-           
-            
-            
-            if (is_array($jsonDecoded)) {
-                if($i==0){
-                    
-                    $i++;
-                    foreach ($jsonDecoded as $key => $value)
-                    {
-                        $csvContent.= '"'.$key.'";';
-                    }
-                    $csvContent .= '
-';
-                    
-                }
-                $csvContent .=  '"'.implode('";"', $jsonDecoded).'"
-';
-              }
-        }
-    }
-    $this->convertToWindowsCharset($csvContent);
-        return $this->responseFactory
-            ->createResponse()
-            ->withHeader(
-                'Content-Type',
-                sprintf('application/json; charset=%s', $charset ?? 'windows-1252')
-            )
-            ->withHeader(
-                'Content-Disposition',
-                sprintf('attachment; filename="%s";', $formIdentifier.'.csv')
-            )
-            ->withHeader(
-                'Content-Length',
-                (string)strlen($csvContent)
-            )
-            ->withBody($this->streamFactory->createStream((string)($csvContent)));
-
-    }
-    /**
-     * Downloads the current results list as CSV
-     *
-     * @throws NoSuchArgumentException
-     * @throws Exception
-     * @todo Add more charsets?
      */
     public function showAction(): ResponseInterface
     {
@@ -135,13 +90,12 @@ final class FormsdbModuleController extends ActionController
         $i=0;
         foreach ($mails as $result) {
             $jsonDecoded = json_decode($result->getMail(), true);
-           
-            
-            
+        
             if (is_array($jsonDecoded)) {
                 if($i==0){
                     
                     $i++;
+                    $csvContent.= '"date";';
                     foreach ($jsonDecoded as $key => $value)
                     {
                         $csvContent.= '"'.$key.'";';
@@ -150,7 +104,7 @@ final class FormsdbModuleController extends ActionController
 ';
                     
                 }
-                $csvContent .=  '"'.implode('";"', $jsonDecoded).'"
+                $csvContent .=  '"'.date('d.m.Y, H:i',$result->getCrdate()).'";"'.implode('";"', $jsonDecoded).'"
 ';
               }
         }
