@@ -143,7 +143,6 @@ class Forms2dbFinisher extends AbstractFinisher
             $formIdentifier = substr($this->formDefinition->getIdentifier(), 0, $delimiter);
             $mail = GeneralUtility::makeInstance(Mail::class);
             $mail->setPersistenceId($formPersistenceIdentifier);
-            $mail->setSiteId($GLOBALS['TYPO3_REQUEST']->getAttribute('site')->getIdentifier());
             $mail->setPid($GLOBALS['TSFE']->id);
             $mail->setMailFromArray($formValues);
             $mail->setPluginId($formPluginUid);
