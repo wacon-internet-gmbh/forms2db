@@ -29,5 +29,5 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Kerstin Schmitt',
     'author_email' => 'info@wacon.de',
     'author_company' => 'WACON Internet GmbH',
-    'version' => '1.1.3'
+    'version' => '1.1.4'
 ];

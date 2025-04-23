@@ -34,12 +34,6 @@ class Mail extends AbstractEntity
      */
     protected string $formId = '';
 
-    /**
-     * The Site Identifier
-     *
-     * @see config/sites/{identifier}/config.yaml
-     */
-    protected string $siteId = '';
 
     /**
      * Uid of the form plugin content element
@@ -100,23 +94,7 @@ protected $crdate;
         $this->formId = $formId;
     }
 
-    /**
-     * @return string
-     */
-    public function getSiteId(): string
-    {
-        return $this->getSiteId;
-    }
 
-    /**
-     * Sets the getSiteId
-     *
-     * @param string $getSiteId
-     */
-    public function setSiteId(string $getSiteId): void
-    {
-        $this->getSiteId = $getSiteId;
-    }
 
     /**
      * Gets the pluginId

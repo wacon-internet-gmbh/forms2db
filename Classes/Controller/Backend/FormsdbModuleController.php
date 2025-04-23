@@ -104,6 +104,7 @@ final class FormsdbModuleController extends ActionController
 ';
                     
                 }
+              //  \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($result->getCrdate());
                 $csvContent .=  '"'.date('d.m.Y, H:i',$result->getCrdate()).'";"'.implode('";"', $jsonDecoded).'"
 ';
               }
