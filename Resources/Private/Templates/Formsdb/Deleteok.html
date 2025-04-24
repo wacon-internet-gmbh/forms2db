@@ -1,0 +1,20 @@
+<html
+   xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+   xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+   xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers"
+   data-namespace-typo3-fluid="true">
+
+   <f:layout name="Module" />
+
+   <f:section name="Content">
+    <p><b>Do you really want to delete the records for the following form?</b></p>
+    <p>Page: {plugin.page_title} ({plugin.page_id})</p>  
+    <p> Plugin ID: {plugin.plugin_id}</p>    
+    <p> Form ID: {plugin.form_id}</p>      
+    <p> # of records: {plugin.count}</p>     
+           
+                <p><f:link.action class="btn btn-warning" action="delete" arguments="{plugin:plugin}">Delete all records </f:link.action></p>
+          
+   </f:section>
+
+</html>

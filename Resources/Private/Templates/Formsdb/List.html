@@ -23,7 +23,8 @@
             </th>
             <th>
             </th>
-
+            <th>
+            </th>
         </tr>
   
        <f:for each="{plugins}" as="plugin">
@@ -33,6 +34,7 @@
                 <td>{plugin.form_id}</td>
                 <td>{plugin.count}</td>
                 <td><f:link.action class="btn btn-primary" action="show" arguments="{plugin:plugin}">Download csv</f:link.action></td>
+                <td><f:link.action class="btn btn-warning" action="deleteok" arguments="{plugin:plugin}">Delete all records </f:link.action></td>
             </tr>
                 
         </f:for>

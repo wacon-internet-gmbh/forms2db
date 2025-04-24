@@ -31,7 +31,7 @@ return [
         'iconIdentifier' => 'actions-print',
         'controllerActions' => [
             FormsdbModuleController::class => [
-                'list','show','excel',
+                'list','show','excel','deleteok','delete',
             ],
         ],
     ],

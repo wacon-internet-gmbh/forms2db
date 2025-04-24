@@ -79,6 +79,39 @@ final class FormsdbModuleController extends ActionController
      * @throws NoSuchArgumentException
      * @throws Exception
      */
+    public function deleteokAction(): ResponseInterface
+    {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
+        
+        $moduleTemplate->assign('plugin', $this->request->getArgument('plugin'));
+        return $moduleTemplate->renderResponse('Formsdb/Deleteok');
+
+    }
+
+      /**
+     * Downloads the current results list as CSV
+     *
+     * @throws NoSuchArgumentException
+     * @throws Exception
+     */
+    public function deleteAction(): ResponseInterface
+    {
+        $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
+        $mails = $this->mailRepository->findByPlugin($this->request->getArgument('plugin'));
+        foreach($mails as $mail){
+            $this->mailRepository->remove ($mail);
+        }
+        $moduleTemplate->assign('plugin', $this->request->getArgument('plugin'));
+        return $moduleTemplate->renderResponse('Formsdb/Delete');
+
+    }
+
+    /**
+     * Downloads the current results list as CSV
+     *
+     * @throws NoSuchArgumentException
+     * @throws Exception
+     */
     public function showAction(): ResponseInterface
     {
         $charset = 'UTF-8';
