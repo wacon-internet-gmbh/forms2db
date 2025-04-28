@@ -137,10 +137,20 @@ final class FormsdbModuleController extends ActionController
 ';
                     
                 }
-              //  \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($result->getCrdate());
-                $csvContent .=  '"'.date('d.m.Y, H:i',$result->getCrdate()).'";"'.implode('";"', $jsonDecoded).'"
+                $csvContent .=  '"'.date('d.m.Y, H:i',$result->getCrdate()).'";"';
+                foreach ($jsonDecoded as $key => $value)
+                {
+                    if(is_array($value)){
+                        $csvContent.= '"'.implode(',', $value).'";';
+                    }
+                    else $csvContent.= '"'.$value.'";';
+                }
+                $csvContent .='
 ';
-              }
+              //  \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($result->getCrdate());
+              //  .implode('";"', $jsonDecoded).'"
+//';
+            }
         }
     }
         return $this->responseFactory

@@ -1,3 +1,6 @@
+## Version 1.2.1
+- [BUGFIX] Add Multiple-Select Handling 
+
 ## Version 1.2.0
 - [FEATURE] Add button "delete records" in BE module 
 
