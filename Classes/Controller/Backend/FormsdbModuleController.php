@@ -137,7 +137,7 @@ final class FormsdbModuleController extends ActionController
 ';
                     
                 }
-                $csvContent .=  '"'.date('d.m.Y, H:i',$result->getCrdate()).'";"';
+                $csvContent .=  '"'.date('d.m.Y, H:i',$result->getCrdate()).'";';
                 foreach ($jsonDecoded as $key => $value)
                 {
                     if(is_array($value)){
