@@ -11,9 +11,7 @@ return [
             'starttime' => 'starttime',
             'endtime' => 'endtime',
         ],
-        'searchFields' => [
-            'ignorePageTypeRestriction' => true
-        ],
+        'searchFields' => 'persistence_id,form_id,plugin_id,mail',
         'security' => [
             'ignorePageTypeRestriction' => true,
         ],
