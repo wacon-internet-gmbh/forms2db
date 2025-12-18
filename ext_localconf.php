@@ -9,15 +9,7 @@
 
 defined('TYPO3') or die();
 use \TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-call_user_func(function (): void {
-    $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
-    $iconRegistry->registerIcon(
-        'actions-print',
-        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        ['source' => 'EXT:forms2db/Resources/Public/Icons/Extension.svg']
-    );
 
-});
 ExtensionManagementUtility::addTypoScriptSetup('
     module.tx_form.settings.yamlConfigurations {
      1560425499 = EXT:forms2db/Configuration/Yaml/BaseSetup.yaml

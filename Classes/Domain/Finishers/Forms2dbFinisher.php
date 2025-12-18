@@ -137,13 +137,14 @@ class Forms2dbFinisher extends AbstractFinisher
             $formPersistenceIdentifier = $this->formDefinition->getPersistenceIdentifier();
 
             $formValues = $this->getFormFieldValues($this->finisherContext->getFormValues());
-
+            $request = $this->finisherContext->getRequest();
             $delimiter = strrpos($this->formDefinition->getIdentifier(), '-');
             $formPluginUid = substr($this->formDefinition->getIdentifier(), $delimiter + 1);
             $formIdentifier = substr($this->formDefinition->getIdentifier(), 0, $delimiter);
             $mail = GeneralUtility::makeInstance(Mail::class);
             $mail->setPersistenceId($formPersistenceIdentifier);
-            $mail->setPid($GLOBALS['TSFE']->id);
+            $pageId = $request->getAttribute('frontend.page.information')->getId();
+            $mail->setPid($pageId);
             $mail->setMailFromArray($formValues);
             $mail->setPluginId($formPluginUid);
             $mail->setFormId($formIdentifier);

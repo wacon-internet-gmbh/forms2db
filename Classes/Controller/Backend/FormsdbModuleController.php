@@ -48,6 +48,7 @@ final class FormsdbModuleController extends ActionController
             while ($row = $result->fetchAssociative()) {
                 // Do something with that single row
                 $myrow = array();
+               
                 $page = $this->pageRepository->getPage($row['pid']);
                 $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_forms2db_domain_model_mail');
                 $myrow['count'] = $queryBuilder
@@ -60,8 +61,9 @@ final class FormsdbModuleController extends ActionController
                 )
                 ->executeQuery()
                 ->fetchOne();
+              //  \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($row);
                 $myrow['page_id']= $row['pid'];
-                $myrow['page_title']= $page['title'];
+                if( $row['pid'])$myrow['page_title']= $page['title'];
                 $myrow['plugin_id']= $row['plugin_id'];
                 $myrow['form_id']= $row['form_id'];
                 $plugins[] = $myrow;
@@ -147,9 +149,7 @@ final class FormsdbModuleController extends ActionController
                 }
                 $csvContent .='
 ';
-              //  \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($result->getCrdate());
-              //  .implode('";"', $jsonDecoded).'"
-//';
+
             }
         }
     }
@@ -197,49 +197,7 @@ final class FormsdbModuleController extends ActionController
         $currentRequest = $this->request;
         $moduleName = $currentRequest->getPluginName();
         $getVars = $this->request->getArguments();
-/*
-        if ($this->request->getControllerActionName() === 'show') {
-            $backFormButton = $buttonBar->makeLinkButton()
-                ->setHref($this->getModuleUrl('web_FormToDatabaseFormresults'))
-                ->setTitle($this->getLanguageService()->sL('LLL:EXT:form_to_database/Resources/Private/Language/locallang_be.xlf:show.buttons.backlink'))
-                ->setShowLabelText(true)
-                //->setIcon($this->iconFactory->getIcon('actions-view-go-back', Icon::SIZE_SMALL))
-                ;
-            $buttonBar->addButton($backFormButton, ButtonBar::BUTTON_POSITION_LEFT);
 
-            if ($formPersistenceIdentifier !== null && $showCsvDownload === true) {
-                $urlParameters = [
-                    'formPersistenceIdentifier' => $formPersistenceIdentifier,
-                ];
-
-                // Full list download-button
-                $downloadCsvFormButton = $buttonBar->makeLinkButton()
-                    ->setHref($this->uriBuilder->uriFor('downloadCsv', $urlParameters))
-                    ->setTitle($this->getLanguageService()->sL('LLL:EXT:form_to_database/Resources/Private/Language/locallang_be.xlf:show.buttons.download_csv'))
-                    ->setShowLabelText(true)
-                    //->setIcon($this->iconFactory->getIcon('actions-download',Icon::SIZE_SMALL))
-                    ;
-                $buttonBar->addButton($downloadCsvFormButton, ButtonBar::BUTTON_POSITION_LEFT, 2);
-
-                // Filtered list download-button
-                $urlParameters['filtered'] = true;
-                $downloadCsvFormButton = $buttonBar->makeLinkButton()
-                    ->setHref($this->uriBuilder->uriFor('downloadCsv', $urlParameters))
-                    ->setTitle($this->getLanguageService()->sL('LLL:EXT:form_to_database/Resources/Private/Language/locallang_be.xlf:show.buttons.download_csv_filtered'))
-                    ->setShowLabelText(true)
-                    //->setIcon($this->iconFactory->getIcon('actions-download', Icon::SIZE_SMALL))
-                    ;
-                $buttonBar->addButton($downloadCsvFormButton, ButtonBar::BUTTON_POSITION_LEFT, 2);
-            }
-        }
-
-        $reloadButton = $buttonBar->makeLinkButton()
-            ->setHref(GeneralUtility::getIndpEnv('REQUEST_URI'))
-            ->setTitle('reload')
-            //->setIcon($this->iconFactory->getIcon('actions-refresh', Icon::SIZE_SMALL))
-            ;
-        $buttonBar->addButton($reloadButton, ButtonBar::BUTTON_POSITION_RIGHT);
-*/
        
     }
 }
