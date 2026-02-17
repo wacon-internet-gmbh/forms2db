@@ -49,7 +49,7 @@ final class FormsdbModuleController extends ActionController
                 // Do something with that single row
                 $myrow = array();
                
-                $page = $this->pageRepository->getPage($row['pid']);
+                $page = $this->pageRepository->getPage($row['pid'],true);
                 $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_forms2db_domain_model_mail');
                 $myrow['count'] = $queryBuilder
                 ->count('uid')
