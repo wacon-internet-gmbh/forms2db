@@ -19,6 +19,9 @@
 			<trans-unit id="tx_forms2db_domain_model_mail.result" resname="tx_forms2db_domain_model_mail.result">
 				<source>Data</source>
 			</trans-unit>
+			<trans-unit id="ext_conf.useLabelsForCsv" resname="ext_conf.useLabelsForCsv">
+                <source>Use labels instead of technical names in CSV export</source>
+            </trans-unit>
 		</body>
 	</file>
 </xliff>

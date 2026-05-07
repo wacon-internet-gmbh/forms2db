@@ -1,0 +1,2 @@
+# cat=basic; type=boolean; label=LLL:EXT:forms2db/Resources/Private/Language/locallang_db.xlf:ext_conf.useLabelsForCsv
+useLabelsForCsv = 0
