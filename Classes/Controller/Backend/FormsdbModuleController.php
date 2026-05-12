@@ -19,11 +19,23 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use WACON\Forms2db\Domain\Repository\MailRepository;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Form\Mvc\Persistence\FormPersistenceManager;
+use TYPO3\CMS\Form\Domain\Factory\ArrayFormFactory;
 
 #[AsController]
 final class FormsdbModuleController extends ActionController
 {
-   
+    private ExtensionConfiguration $extensionConfiguration;
+    private FormPersistenceManager $formPersistenceManager;
+    private ArrayFormFactory $arrayFormFactory;
+
+    /**
+     * @param ModuleTemplateFactory $moduleTemplateFactory
+     * @param MailRepository $mailRepository
+     * @param PageRepository $pageRepository
+     * @param ConnectionPool $connectionPool
+     */
     public function __construct(
         protected readonly ModuleTemplateFactory $moduleTemplateFactory,
         protected readonly MailRepository $mailRepository,
@@ -31,6 +43,22 @@ final class FormsdbModuleController extends ActionController
         private readonly ConnectionPool $connectionPool,
     ) {
     }
+
+    public function injectExtensionConfiguration(ExtensionConfiguration $extensionConfiguration): void
+    {
+        $this->extensionConfiguration = $extensionConfiguration;
+    }
+
+    public function injectFormPersistenceManager(FormPersistenceManager $formPersistenceManager): void
+    {
+        $this->formPersistenceManager = $formPersistenceManager;
+    }
+
+    public function injectArrayFormFactory(ArrayFormFactory $arrayFormFactory): void
+    {
+        $this->arrayFormFactory = $arrayFormFactory;
+    }
+    
     /**
      * Form Overview
      *   * @return ResponseInterface
@@ -44,14 +72,14 @@ final class FormsdbModuleController extends ActionController
             ->from('tx_forms2db_domain_model_mail')
             ->groupBy('pid','plugin_id','form_id')
             ->executeQuery();
-            $plugins = array();
-            while ($row = $result->fetchAssociative()) {
-                // Do something with that single row
-                $myrow = array();
-               
-                $page = $this->pageRepository->getPage($row['pid'],true);
-                $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_forms2db_domain_model_mail');
-                $myrow['count'] = $queryBuilder
+        $plugins = array();
+        while ($row = $result->fetchAssociative()) {
+            // Do something with that single row
+            $myrow = array();
+
+            $page = $this->pageRepository->getPage($row['pid'],true);
+            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_forms2db_domain_model_mail');
+            $myrow['count'] = $queryBuilder
                 ->count('uid')
                 ->from('tx_forms2db_domain_model_mail')
                 ->where(
@@ -61,20 +89,20 @@ final class FormsdbModuleController extends ActionController
                 )
                 ->executeQuery()
                 ->fetchOne();
-              //  \TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($row);
-                $myrow['page_id']= $row['pid'];
-                if( $row['pid'])$myrow['page_title']= $page['title'];
-                $myrow['plugin_id']= $row['plugin_id'];
-                $myrow['form_id']= $row['form_id'];
-                $plugins[] = $myrow;
-            }
+        
+            $myrow['page_id']= $row['pid'];
+            if( $row['pid'])$myrow['page_title']= $page['title'];
+            $myrow['plugin_id']= $row['plugin_id'];
+            $myrow['form_id']= $row['form_id'];
+            $plugins[] = $myrow;
+        }
         $moduleTemplate->assign('plugins', $plugins);
 
         return $moduleTemplate->renderResponse('Formsdb/List');
     }
 
 
-    
+
     /**
      * Downloads the current results list as CSV
      *
@@ -84,13 +112,13 @@ final class FormsdbModuleController extends ActionController
     public function deleteokAction(): ResponseInterface
     {
         $moduleTemplate = $this->moduleTemplateFactory->create($this->request);
-        
+
         $moduleTemplate->assign('plugin', $this->request->getArgument('plugin'));
         return $moduleTemplate->renderResponse('Formsdb/Deleteok');
 
     }
 
-      /**
+    /**
      * Downloads the current results list as CSV
      *
      * @throws NoSuchArgumentException
@@ -118,41 +146,144 @@ final class FormsdbModuleController extends ActionController
     {
         $charset = 'UTF-8';
         if(array_key_exists('plugin', $this->request->getArguments())){
-        $plugin = $this->request->getArgument('plugin');
-        $mails = $this->mailRepository->findByPlugin($this->request->getArgument('plugin'));
-        $formIdentifier = 'page-'.$plugin['page_id'].'_plugin-'.$plugin['plugin_id'].'_form-'.$plugin['form_id'].'_'.date("Y-m-d");
-        $csvContent = '';
-        $i=0;
-        foreach ($mails as $result) {
-            $jsonDecoded = json_decode($result->getMail(), true);
-        
-            if (is_array($jsonDecoded)) {
-                if($i==0){
-                    
-                    $i++;
-                    $csvContent.= '"date";';
+            $plugin = $this->request->getArgument('plugin');
+            $mails = $this->mailRepository->findByPlugin($this->request->getArgument('plugin'));
+            $formIdentifier = 'page-'.$plugin['page_id'].'_plugin-'.$plugin['plugin_id'].'_form-'.$plugin['form_id'].'_'.date("Y-m-d");
+            $formIdentifierlabel = 'Page-ID: '.$plugin['page_id'].', Plugin-ID: '.$plugin['plugin_id'].', Form-ID: '.$plugin['form_id'].', Date: '.date("Y-m-d");
+
+            $useLabels = (bool)($this->extensionConfiguration->get('forms2db')['useLabelsForCsv'] ?? false);
+            $labelMap = [];
+            if ($useLabels && count($mails) > 0) {
+                $firstMail = $mails->getFirst();
+                if ($firstMail !== null) {
+                    $persistenceIdentifier = $firstMail->getPersistenceId();
+                    if ($persistenceIdentifier) {
+                        try {
+                            $formDefinitionArray = $this->formPersistenceManager->load($persistenceIdentifier);
+                            $formDefinition = $this->arrayFormFactory->build($formDefinitionArray);
+                            $renderables = $formDefinition->getRenderablesRecursively();
+                            foreach ($renderables as $renderable) {
+                                if ($renderable instanceof \TYPO3\CMS\Form\Domain\Model\FormElements\FormElementInterface) {
+                                    if($renderable->getLabel())$labelMap[$renderable->getIdentifier()] = $renderable->getLabel();
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            // Fallback to identifiers if loading fails
+                        }
+                    }
+                }
+            }
+
+            $csvContent = array();
+            $i=0;
+            foreach ($mails as $result) {
+                $jsonDecoded = json_decode($result->getMail(), true);
+
+                if (is_array($jsonDecoded)) {
+                    if($i==0){
+                        $csvRow = array();
+                        $i++;
+                        $csvRow[] = '"Date"';
+                        foreach ($jsonDecoded as $key => $value)
+                        {
+                            $label = ($useLabels && !empty($labelMap[$key])) ? $labelMap[$key] : $key;
+                            $csvRow[] = $label;
+                        }
+                        $csvContent[] = $csvRow;
+
+                    }
+                    $csvRow = array();
+                    $csvRow[] = date('d.m.Y, H:i',$result->getCrdate());
                     foreach ($jsonDecoded as $key => $value)
                     {
-                        $csvContent.= '"'.$key.'";';
+                        if(is_array($value)){
+                            $csvRow[]= implode(',', $value);
+                        }
+                        else $csvRow[]= '"'.$value.'"';
                     }
-                    $csvContent .= '
-';
-                    
-                }
-                $csvContent .=  '"'.date('d.m.Y, H:i',$result->getCrdate()).'";';
-                foreach ($jsonDecoded as $key => $value)
-                {
-                    if(is_array($value)){
-                        $csvContent.= '"'.implode(',', $value).'";';
-                    }
-                    else $csvContent.= '"'.$value.'";';
-                }
-                $csvContent .='
-';
+                    $csvContent[] = $csvRow;
 
+                }
             }
         }
+        $fileOut = fopen("php://output", 'w') or die("Unable open php://output");
+        foreach ($csvContent as $line) {
+            fputcsv($fileOut, $line, ';');
+        }
+       
+
+        return $this->responseFactory
+            ->createResponse()
+            ->withHeader(
+                'Content-Type',
+                sprintf('application/csv; charset=%s', $charset ?? 'utf-8')
+            )
+            ->withHeader(
+                'Content-Disposition',
+                sprintf('attachment; name="'.$formIdentifierlabel.'";filename="'.$formIdentifier.'.csv"')
+            )
+            ->withHeader(
+                'Content-Length',
+                (string)strlen($this->streamFactory->createStreamFromResource($fileOut)->getContents())
+            )
+           
+            ->withBody($this->streamFactory->createStreamFromResource($fileOut));
+            fclose($fileOut);
+
     }
+
+
+ /**
+     * Downloads the current results list as json
+     *
+     * @throws NoSuchArgumentException
+     * @throws Exception
+     */
+    public function jsonAction(): ResponseInterface
+    {
+        $charset = 'UTF-8';
+        if(array_key_exists('plugin', $this->request->getArguments())){
+            $plugin = $this->request->getArgument('plugin');
+            $mails = $this->mailRepository->findByPlugin($this->request->getArgument('plugin'));
+            $formIdentifier = 'page-'.$plugin['page_id'].'_plugin-'.$plugin['plugin_id'].'_form-'.$plugin['form_id'].'_'.date("Y-m-d");
+            $formIdentifierlabel = 'Page-ID: '.$plugin['page_id'].', Plugin-ID: '.$plugin['plugin_id'].', Form-ID: '.$plugin['form_id'].', Date: '.date("Y-m-d");
+
+            $useLabels = (bool)($this->extensionConfiguration->get('forms2db')['useLabelsForCsv'] ?? false);
+            $labelMap = [];
+            if ($useLabels && count($mails) > 0) {
+                $firstMail = $mails->getFirst();
+                if ($firstMail !== null) {
+                    $persistenceIdentifier = $firstMail->getPersistenceId();
+                    if ($persistenceIdentifier) {
+                        try {
+                            $formDefinitionArray = $this->formPersistenceManager->load($persistenceIdentifier);
+                            $formDefinition = $this->arrayFormFactory->build($formDefinitionArray);
+                            $renderables = $formDefinition->getRenderablesRecursively();
+                            foreach ($renderables as $renderable) {
+                                if ($renderable instanceof \TYPO3\CMS\Form\Domain\Model\FormElements\FormElementInterface) {
+                                    if($renderable->getLabel())$labelMap[$renderable->getIdentifier()] = $renderable->getLabel();
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            // Fallback to identifiers if loading fails
+                        }
+                    }
+                }
+            }
+
+            $csvContent = array();
+            
+            $j=0;
+
+            foreach ($mails as $result) {
+                $j++;
+
+                    $csvContent[$j] = $result->getMail();
+
+                
+            }
+        }
+
         return $this->responseFactory
             ->createResponse()
             ->withHeader(
@@ -161,25 +292,26 @@ final class FormsdbModuleController extends ActionController
             )
             ->withHeader(
                 'Content-Disposition',
-                sprintf('attachment; filename="%s";', $formIdentifier.'.csv')
+                sprintf('attachment; name="'.$formIdentifierlabel.'";filename="'.$formIdentifier.'.json"')
             )
             ->withHeader(
                 'Content-Length',
-                (string)strlen($csvContent)
+                (string)strlen(json_encode($csvContent))
             )
-            ->withBody($this->streamFactory->createStream((string)($csvContent)));
+            ->withBody($this->streamFactory->createStream((string)(json_encode($csvContent))));
+           
 
     }
     protected function convertToWindowsCharset($string) {
         $charset =  mb_detect_encoding(
-          $string,
-          "UTF-8, utf-8, ISO-8859-1, ISO-8859-15",
-          true
+            $string,
+            "UTF-8, utf-8, ISO-8859-1, ISO-8859-15",
+            true
         );
-      
+
         $string =  mb_convert_encoding($string, "Windows-1252", $charset);
         return $string;
-      }
+    }
 
     /**
      * Register document header buttons
@@ -198,6 +330,6 @@ final class FormsdbModuleController extends ActionController
         $moduleName = $currentRequest->getPluginName();
         $getVars = $this->request->getArguments();
 
-       
+
     }
 }
