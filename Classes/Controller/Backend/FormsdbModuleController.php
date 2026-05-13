@@ -206,13 +206,14 @@ final class FormsdbModuleController extends ActionController
                 }
             }
         }
-        $fileOut = fopen("php://output", 'w') or die("Unable open php://output");
+        /*$fileOut = fopen('php://temp', 'w+');
         foreach ($csvContent as $line) {
             fputcsv($fileOut, $line, ';');
-        }
-       
-
-        return $this->responseFactory
+        }*/
+         $csvString = $this->generateCsv($csvContent);
+   //$stream = $this->streamFactory->createStreamFromResource($fileOut);
+        $stream = $this->streamFactory->createStream($csvString);
+       $response = $this->responseFactory
             ->createResponse()
             ->withHeader(
                 'Content-Type',
@@ -224,14 +225,26 @@ final class FormsdbModuleController extends ActionController
             )
             ->withHeader(
                 'Content-Length',
-                (string)strlen($this->streamFactory->createStreamFromResource($fileOut)->getContents())
+                (string)strlen($stream->getContents())
             )
            
-            ->withBody($this->streamFactory->createStreamFromResource($fileOut));
-            fclose($fileOut);
+            ->withBody($stream);
+            
+           return $response;
 
     }
-
+protected function generateCsv($data) {
+       $handle = fopen('php://temp', 'r+');
+       foreach ($data as $line) {
+               fputcsv($handle, $line);
+       }
+       rewind($handle);
+       while (!feof($handle)) {
+               $contents .= fread($handle, 8192);
+       }
+       fclose($handle);
+       return $contents;
+}
 
  /**
      * Downloads the current results list as json
