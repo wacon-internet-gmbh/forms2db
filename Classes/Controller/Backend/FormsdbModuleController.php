@@ -183,7 +183,7 @@ final class FormsdbModuleController extends ActionController
                     if($i==0){
                         $csvRow = array();
                         $i++;
-                        $csvRow[] = '"Date"';
+                        $csvRow[] = 'Date';
                         foreach ($jsonDecoded as $key => $value)
                         {
                             $label = ($useLabels && !empty($labelMap[$key])) ? $labelMap[$key] : $key;
@@ -199,7 +199,7 @@ final class FormsdbModuleController extends ActionController
                         if(is_array($value)){
                             $csvRow[]= implode(',', $value);
                         }
-                        else $csvRow[]= '"'.$value.'"';
+                        else $csvRow[]= $value;
                     }
                     $csvContent[] = $csvRow;
 
@@ -234,6 +234,7 @@ final class FormsdbModuleController extends ActionController
 
     }
 protected function generateCsv($data) {
+    $contents = '';
        $handle = fopen('php://temp', 'r+');
        foreach ($data as $line) {
                fputcsv($handle, $line);
