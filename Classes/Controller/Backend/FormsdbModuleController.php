@@ -206,18 +206,14 @@ final class FormsdbModuleController extends ActionController
                 }
             }
         }
-        /*$fileOut = fopen('php://temp', 'w+');
-        foreach ($csvContent as $line) {
-            fputcsv($fileOut, $line, ';');
-        }*/
+  
          $csvString = $this->generateCsv($csvContent);
-   //$stream = $this->streamFactory->createStreamFromResource($fileOut);
         $stream = $this->streamFactory->createStream($csvString);
        $response = $this->responseFactory
             ->createResponse()
             ->withHeader(
                 'Content-Type',
-                sprintf('application/csv; charset=%s', $charset ?? 'utf-8')
+                sprintf('text/csv; charset=%s', $charset ?? 'utf-8')
             )
             ->withHeader(
                 'Content-Disposition',
@@ -225,7 +221,7 @@ final class FormsdbModuleController extends ActionController
             )
             ->withHeader(
                 'Content-Length',
-                (string)strlen($stream->getContents())
+                sprintf('%d', $stream->getSize())
             )
            
             ->withBody($stream);
@@ -335,7 +331,7 @@ protected function generateCsv($data) {
      * @noinspection PhpUndefinedMethodInspection
      */
     protected function registerDocheaderButtons(
-        string $formPersistenceIdentifier = null,
+        ?string $formPersistenceIdentifier = null,
         bool $showCsvDownload = false
     ): void {
         /** @var ButtonBar $buttonBar */
